@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #endif
 
-static const char* hexmap = "0123456789ABCDEF";
+static const char* hexmap = "0123456789abcdef";
 static uint32_t defClr = 0xFF7F00;
 
 uint32_t getDefaultRoomColor() {
@@ -43,7 +43,8 @@ std::string getSocketIp(uS::Socket * s, uWS::HttpRequest req) {
 	switch (addr.family[3]) {
 		case '6':
 		case '4':
-			return addr.address;
+			uWS::Header h = req.getHeader("cf-connecting-ip");
+			return h ? h.toString() : "";
 			break;
 
 #ifdef UWS_UDS
