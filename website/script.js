@@ -879,7 +879,7 @@ Rect.prototype.contains = function(x, y) {
 	    this.packs = [];
 	    this.piano = piano;
 	    this.soundSelection = localStorage.soundSelection ? localStorage.soundSelection : "mppclassic";
-	    this.addPack({name: "MPP Classic", keys: Object.keys(this.piano.keys), ext: ".mp3", url: "/piano-sounds/"});
+	    this.addPack({name: "MPP Classic", keys: Object.keys(this.piano.keys), ext: ".mp3", url: "/sounds/"});
 	}
 
 	SoundSelector.prototype.addPack = function(pack, load) {
