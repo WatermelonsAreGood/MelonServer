@@ -557,15 +557,12 @@ int main(int argc, char *argv[]){
 	std::string addr = "0.0.0.0";
 	std::string pass = "fuckthisshit";
 	std::string salt = "I HAVE PRESIDENTIAL AIDS";
-	
+
 	int port = 20005;
 	
 	if(config.contains("addr")) addr = config["addr"];
-	
 	if(config.contains("pass")) pass = config["pass"];
-	
 	if(config.contains("salt")) salt = config["salt"];
-
 	if(config.contains("port")) port = config["port"];
 	
 	std::cout << "Listening on " + addr + ":" << port << "!" << std::endl;
