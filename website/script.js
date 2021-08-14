@@ -869,7 +869,7 @@ Rect.prototype.contains = function(x, y) {
 
 ////////////////////////////////////////////////////////////////
 
-    var soundDomain = location.hostname === 'www.mppclone.com' ? 'https://www.mppclone.com' : 'https://mppclone.com';
+    var soundDomain = "https://mpp.yourfriend.lv/";
 
 	function SoundSelector(piano) {
 	    this.initialized = false;
@@ -879,7 +879,7 @@ Rect.prototype.contains = function(x, y) {
 	    this.packs = [];
 	    this.piano = piano;
 	    this.soundSelection = localStorage.soundSelection ? localStorage.soundSelection : "mppclassic";
-	    this.addPack({name: "MPP Classic", keys: Object.keys(this.piano.keys), ext: ".mp3", url: "/sounds/mppclassic/"});
+	    this.addPack({name: "MPP Classic", keys: Object.keys(this.piano.keys), ext: ".mp3", url: "/piano-sounds/"});
 	}
 
 	SoundSelector.prototype.addPack = function(pack, load) {

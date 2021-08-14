@@ -4,3 +4,6 @@
 [submodule "json"]
 	path = lib/json
 	url = https://github.com/nlohmann/json
+[submodule "website/sounds"]
+	path = website/sounds
+	url = https://github.com/ledlamp/piano-sounds
