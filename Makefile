@@ -43,9 +43,6 @@ g: CPPFLAGS += $(OPT_DBG)
 g: LDFLAGS  += $(LD_DBG)
 g: preconditions $(TARGET)
 
-preconditions:
-	mkdir -p build
-
 $(TARGET): $(OBJ_FILES) $(LIB_FILES)
 	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 

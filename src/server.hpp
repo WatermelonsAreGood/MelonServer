@@ -36,6 +36,8 @@ struct jroom_clinfo_t {
 
 class server {
 public:
+	nlohmann::json getConfig();
+
 	class Client;
 	class Room;
 	class Database {
@@ -139,7 +141,7 @@ public:
 		static void lsl(server*, nlohmann::json&, uWS::WebSocket<uWS::SERVER> *); /* -ls */
 		static void lsp(server*, nlohmann::json&, uWS::WebSocket<uWS::SERVER> *); /* +ls */
 	};
-	server(std::string path, uint16_t p, const std::string& pw) : path(path), port(p), h(uWS::NO_DELAY, true, 16384), db("database/"), adminpw(pw){
+	server(std::string path, uint16_t p, const std::string& pw, std::string salt) : path(path), salt(salt), port(p), h(uWS::NO_DELAY, true, 16384), db("database/"), adminpw(pw){
 		funcmap = {
 			{"n", std::bind(msg::n, this, std::placeholders::_1, std::placeholders::_2)},
 			{"a", std::bind(msg::a, this, std::placeholders::_1, std::placeholders::_2)},
@@ -167,6 +169,7 @@ public:
 	bool is_adminpw(const std::string p){return p == adminpw;};
 private:
 	std::string path;
+	std::string salt;
 	uint16_t port;
 	uWS::Hub h;
 	server::Database db;

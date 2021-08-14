@@ -43,8 +43,10 @@ std::string getSocketIp(uS::Socket * s, uWS::HttpRequest req) {
 	switch (addr.family[3]) {
 		case '6':
 		case '4':
-			uWS::Header h = req.getHeader("cf-connecting-ip");
-			return h ? h.toString() : "";
+			uWS::Header cf = req.getHeader("cf-connecting-ip");
+			uWS::Header xf = req.getHeader("X-Forwarded-For");
+			
+			return cf ? cf.toString() : xf.toString();
 			break;
 
 #ifdef UWS_UDS
@@ -133,18 +135,6 @@ nlohmann::json server::Room::get_json(std::string _id, bool includeppl){
 
 nlohmann::json server::Room::get_chatlog_json(){
 	nlohmann::json log = nlohmann::json::array();
-#ifdef FOR_OWOPP
-	log.push_back({
-		{"m", "a"},
-		{"a", "This is not the official MPP website. You can find the (better!) original at: http://multiplayerpiano.com/"},
-		{"p", {
-			{"name", "NOTE"},
-			{"color", "#AAAAAA"},
-			{"_id", "server ily_brandon_dont_c&d_thx[="}
-		}},
-		{"t", 0}
-	});
-#endif
 	for(auto& msg : chatlog){
 		log.push_back(msg);
 	}
@@ -408,11 +398,11 @@ nlohmann::json server::genusr(uWS::WebSocket<uWS::SERVER> * s){
 	std::string ip = *(std::string *) s->getUserData();
 	auto search = clients.find(ip);
 	if(search == clients.end()){
-		std::string saltedip(ip + "cool salt");
+		std::string saltedip(ip + this->salt);
 		unsigned char hash[20];
 		std::string _id(20, '0');
 		std::string filen(40, '0');
-		std::string name("Anonymoose");
+		std::string name("Rawr~");
 		SHA1((unsigned char*)saltedip.c_str(), saltedip.size(), hash);
 		for(uint8_t i = 0; i < 10; i++){
 			_id[2 * i] = hexmap[(hash[i] & 0xF0) >> 4];
@@ -453,10 +443,6 @@ void server::run(){
 #ifdef UWS_UDS
 	umask(m);
 #endif
-
-	std::cout << "Listening on " << path << ":" << port << std::endl;
-	std::cout << "Password is: " << adminpw << std::endl;
-
 	reg_evts(h);
 	h.run();
 }
@@ -474,11 +460,7 @@ void server::reg_evts(uWS::Hub &s){
 			auto ssearch = search->second.sockets.find(socket);
 			if(ssearch != search->second.sockets.end()){
 				auto tsearch = rooms.find(ssearch->second);
-				if(tsearch != rooms.end() && tsearch->second->kick_usr(socket, search->second, tsearch->first)
-#ifdef FOR_OWOPP
-						&& tsearch->first != "lobby"
-#endif
-						){
+				if(tsearch != rooms.end() && tsearch->second->kick_usr(socket, search->second, tsearch->first)){
 					std::cout << "Deleted room: " << tsearch->first << std::endl;
 					delete tsearch->second;
 					rooms.erase(tsearch);
@@ -555,25 +537,42 @@ void server::parse_msg(nlohmann::json& msg, uWS::WebSocket<uWS::SERVER> * socket
 	}
 }
 
-int main(int argc, char *argv[]){
-	if(argc >= 2){
-		std::string pass(argv[1]);
-		uint16_t port = 1234;
-		std::string addr("0.0.0.0");
-		if (argc >= 3) port = std::stoul(argv[2]);
-		if (argc >= 4) {
-			std::string clr(argv[3]);
-			if (clr[0] == '#') clr.erase(0, 1);
-			defClr = std::stoull(clr, nullptr, 16);
-			std::cout << "Set default room color to: " << std::hex << defClr << std::dec << std::endl;
-		}
-		if (argc >= 5) addr = argv[4];
+nlohmann::json getConfig() {
+	std::ifstream i("config.json");
+	nlohmann::json j;
 
-		server s(addr, port, pass);
-		s.run();
+	if(i.good()) {
+		i >> j;
 	} else {
-		std::cout << "Usage: " << argv[0] << " ADMINPASSWORD [PORT {1234}] [DEFAULT_COLOR {FF7F00}] [LISTEN_ADDR]" << std::endl;
+		std::cout << "could not find config.json - quitting";
+		std::exit(0);
 	}
+	
+	return j;
+}
 
+int main(int argc, char *argv[]){
+	nlohmann::json config = getConfig();
+
+	std::string addr = "0.0.0.0";
+	std::string pass = "fuckthisshit";
+	std::string salt = "I HAVE PRESIDENTIAL AIDS";
+	
+	int port = 20005;
+	
+	if(config.contains("addr")) addr = config["addr"];
+	
+	if(config.contains("pass")) pass = config["pass"];
+	
+	if(config.contains("salt")) salt = config["salt"];
+
+	if(config.contains("port")) port = config["port"];
+	
+	std::cout << "Listening on " + addr + ":" << port << "!" << std::endl;
+	std::cout << "APass length: " << pass.length() << "!" << std::endl;
+	std::cout << "Salt length: " << salt.length() << "!" << std::endl;
+	
+	server s(addr, port, pass, salt);
+	s.run();
 	return 1;
 }
