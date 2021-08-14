@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <chrono>
+#include <vector>
 
 /* sha1 hashing */
 #include <openssl/sha.h>
@@ -151,7 +152,8 @@ nlohmann::json server::Client::get_json(){
 	return nlohmann::json::object({
 		{"name", name},
 		{"color", std::string("#")+n2hexstr(color)},
-		{"_id", _id}
+		{"_id", _id},
+		{"tag", (admin ? "OWNER" : "")}
 	});
 }
 
@@ -424,8 +426,12 @@ nlohmann::json server::genusr(uWS::WebSocket<uWS::SERVER> * s){
 			color = dbusr.color;
 			name = dbusr.name;
 		}
+		
+		std::vector<std::string> admins = this->admins;
+
 		std::cout << "New client(" << (dbusr.found ? 'd' : 'n') << "): " << ip << std::endl;
-		clients[ip] = {new server::Client(filen, _id, color, name), {{s, ""}}};
+		std::cout << "admin: " << std::count(admins.begin(), admins.end(), ip) << std::endl;
+		clients[ip] = {new server::Client(filen, _id, color, name, std::count(admins.begin(), admins.end(), ip)), {{s, ""}}};
 	} else {
 		search->second.sockets.emplace(s, "");
 	}
@@ -557,6 +563,7 @@ int main(int argc, char *argv[]){
 	std::string addr = "0.0.0.0";
 	std::string pass = "fuckthisshit";
 	std::string salt = "I HAVE PRESIDENTIAL AIDS";
+	std::vector<std::string> admins = config["admins"];
 
 	int port = 20005;
 	
@@ -564,12 +571,12 @@ int main(int argc, char *argv[]){
 	if(config.contains("pass")) pass = config["pass"];
 	if(config.contains("salt")) salt = config["salt"];
 	if(config.contains("port")) port = config["port"];
-	
+
 	std::cout << "Listening on " + addr + ":" << port << "!" << std::endl;
 	std::cout << "APass length: " << pass.length() << "!" << std::endl;
 	std::cout << "Salt length: " << salt.length() << "!" << std::endl;
-	
-	server s(addr, port, pass, salt);
+
+	server s(addr, port, pass, salt, admins);
 	s.run();
 	return 1;
 }

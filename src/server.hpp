@@ -64,12 +64,13 @@ public:
 		std::string name;
 		std::string _id;
 	public:
-		Client(std::string filen, std::string n_id, uint32_t clr, std::string nme) :
+		Client(std::string filen, std::string n_id, uint32_t clr, std::string nme, bool admin) :
 			color(clr),
 			name(nme),
 			_id(n_id),
 			filen(filen),
-			changed(false){};
+			changed(false),
+			admin(admin){};
 		nlohmann::json get_json();
 		Database::pinfo_t get_dbdata();
 		void set_name(std::string n){name=n;};
@@ -77,6 +78,7 @@ public:
 		ClientLimit quota;
 		std::string filen;
 		bool changed;
+		bool admin;
 	};
 	class Room {
 		struct oinfo_t {
@@ -141,7 +143,7 @@ public:
 		static void lsl(server*, nlohmann::json&, uWS::WebSocket<uWS::SERVER> *); /* -ls */
 		static void lsp(server*, nlohmann::json&, uWS::WebSocket<uWS::SERVER> *); /* +ls */
 	};
-	server(std::string path, uint16_t p, const std::string& pw, std::string salt) : path(path), salt(salt), port(p), h(uWS::NO_DELAY, true, 16384), db("database/"), adminpw(pw){
+	server(std::string path, uint16_t p, const std::string& pw, std::string salt, std::vector<std::string> admins) : path(path), salt(salt), admins(admins), port(p), h(uWS::NO_DELAY, true, 16384), db("database/"), adminpw(pw){
 		funcmap = {
 			{"n", std::bind(msg::n, this, std::placeholders::_1, std::placeholders::_2)},
 			{"a", std::bind(msg::a, this, std::placeholders::_1, std::placeholders::_2)},
@@ -170,6 +172,7 @@ public:
 private:
 	std::string path;
 	std::string salt;
+	std::vector<std::string> admins;
 	uint16_t port;
 	uWS::Hub h;
 	server::Database db;
