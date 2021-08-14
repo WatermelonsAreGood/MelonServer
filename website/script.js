@@ -1393,7 +1393,7 @@ Rect.prototype.contains = function(x, y) {
         }
         function tagColor(tag) {
             if (tag === 'BOT') return '#55f';
-            if (tag === 'OWNER') return '#a00';
+            if (tag === 'OWNER') return '#a7af16';
             if (tag === 'ADMIN') return '#f55';
             if (tag === 'MOD') return '#0a0';
             if (tag === 'MEDIA') return '#f5f';
