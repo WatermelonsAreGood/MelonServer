@@ -3,19 +3,20 @@
 #include <string>
 
 server::Database::pinfo_t server::Database::get_usrinfo(std::string hash){
+	
+	std::ifstream people_file(dir + hash, std::ifstream::binary);
 	server::Database::pinfo_t ret = {false, 0, {}};
-	std::fstream file(std::string(dir + hash), std::fstream::in | std::fstream::out | std::fstream::binary);
-	if(!file) return ret;
-	std::streampos old = file.tellg();
-	file.seekg(0, std::fstream::end);
-	long int size = file.tellg();
-	if(size < 5) return ret;
-	ret.found = true;
-	file.seekg(old);
-	file.read((char*)&ret.color, 4);
-	ret.name.resize(size - 4);
-	file.read((char*)&ret.name[0], size - 4);
-	file.close();
+
+	if(people_file.good()) {
+		ret.found = true;
+
+		std::string str((std::istreambuf_iterator<char>(people_file)),
+                 std::istreambuf_iterator<char>());
+
+		ret.from_json(nlohmann::json::parse(str), ret);
+	}
+
+	people_file.close();
 	return ret;
 }
 
@@ -25,7 +26,12 @@ void server::Database::set_usrinfo(std::string hash, pinfo_t usr){
 		std::cout << "Could not create file!" << std::endl;
 		return;
 	}
-	file.write((char*)&usr.color, sizeof(usr.color));
-	file.write(usr.name.c_str(), usr.name.size());
+
+	nlohmann::json j;
+	
+	usr.to_json(j, usr);
+
+	file << j.dump() << std::endl;
+	
 	file.close();
 }

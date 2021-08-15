@@ -429,8 +429,7 @@ nlohmann::json server::genusr(uWS::WebSocket<uWS::SERVER> * s){
 		
 		std::vector<std::string> admins = this->admins;
 
-		std::cout << "New client(" << (dbusr.found ? 'd' : 'n') << "): " << ip << std::endl;
-		std::cout << "admin: " << std::count(admins.begin(), admins.end(), ip) << std::endl;
+		std::cout << "New client" << (std::count(admins.begin(), admins.end(), ip) ? " (admin)" : "") << ": " << ip << std::endl;
 		clients[ip] = {new server::Client(filen, _id, color, name, std::count(admins.begin(), admins.end(), ip)), {{s, ""}}};
 	} else {
 		search->second.sockets.emplace(s, "");
