@@ -5,7 +5,7 @@
 server::Database::pinfo_t server::Database::get_usrinfo(std::string hash){
 	
 	std::ifstream people_file(dir + hash, std::ifstream::binary);
-	server::Database::pinfo_t ret = {false, 0, {}};
+	server::Database::pinfo_t ret = {false, 0, {}, ""};
 
 	if(people_file.good()) {
 		ret.found = true;

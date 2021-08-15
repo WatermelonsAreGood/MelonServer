@@ -47,7 +47,8 @@ public:
 			bool found;
 			uint32_t color;
 			std::string name;
-			NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(pinfo_t, color, name)
+			std::string tag;
+			NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(pinfo_t, color, name, tag)
 		};
 		Database(const std::string& dir) : dir(dir){
 			makedir(dir);
@@ -65,21 +66,24 @@ public:
 		std::string name;
 		std::string _id;
 	public:
-		Client(std::string filen, std::string n_id, uint32_t clr, std::string nme, bool admin) :
+		Client(std::string filen, std::string n_id, uint32_t clr, std::string nme, bool admin, std::string tag) :
 			color(clr),
 			name(nme),
 			_id(n_id),
 			filen(filen),
 			changed(false),
-			admin(admin){};
+			admin(admin),
+			tag(tag){};
 		nlohmann::json get_json();
 		Database::pinfo_t get_dbdata();
 		void set_name(std::string n){name=n;};
+		void set_tag(std::string n){tag=n;};
 		void set_color(uint32_t c){color=c;};
 		ClientLimit quota;
 		std::string filen;
 		bool changed;
 		bool admin;
+		std::string tag;
 	};
 	class Room {
 		struct oinfo_t {

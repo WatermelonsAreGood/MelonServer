@@ -59,6 +59,42 @@ void server::msg::n(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 	}
 }
 
+
+static std::vector<std::string> split(std::string str)
+{
+    // Used to split string around spaces.
+    std::istringstream ss(str);
+  
+    std::string word; // for storing each word
+	
+	std::vector<std::string> chars;
+
+    // Traverse through all words
+    // while loop till we get 
+    // strings to store in string word
+    while (ss >> word) 
+    {
+		chars.push_back(word);
+    }
+
+	return chars;
+}
+
+void sendserver(server* sv, std::string text, uWS::WebSocket<uWS::SERVER> * s, server::Room* room) {
+	json res = json::array();
+	res[0] = {
+		{"m", "a"},
+		{"a", text},
+		{"p", {{"_id", "server"}, {"color", "#25ab2c"}, {"id", "server123"}, {"name", "Server"}}},
+		{"t", js_date_now()}
+	};
+	
+	room->push_chat(res[0]);
+	room->broadcast(res, s);
+
+	s->send((char *)res.dump().c_str(), res.dump().size(), uWS::TEXT);
+}
+
 void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 	auto search = sv->clients.find(*(std::string *) s->getUserData());
 	if(search != sv->clients.end() &&
@@ -79,6 +115,16 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 				ssearch->second->push_chat(res[0]);
 				ssearch->second->broadcast(res, s);
 				s->send((char *)res.dump().c_str(), res.dump().size(), uWS::TEXT);
+				Client* client = search->second.user;
+				if(client->admin) {	
+					std::string message = j["message"].get<std::string>();
+					std::vector<std::string> args = split(message);
+					
+					std::string command = *(args.begin());
+					if(command == "~test") {
+						sendserver(sv, "test suceeded", s, ssearch->second);
+                    }
+				}
 			}
 		}
 	}

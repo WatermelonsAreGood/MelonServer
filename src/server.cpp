@@ -153,12 +153,12 @@ nlohmann::json server::Client::get_json(){
 		{"name", name},
 		{"color", std::string("#")+n2hexstr(color)},
 		{"_id", _id},
-		{"tag", (admin ? "OWNER" : "")}
+		{"tag", tag}
 	});
 }
 
 server::Database::pinfo_t server::Client::get_dbdata(){
-	return {true, color, name};
+	return {true, color, name, tag};
 }
 
 void server::Room::broadcast(nlohmann::json& j, uWS::WebSocket<uWS::SERVER> * exclude){
@@ -421,16 +421,19 @@ nlohmann::json server::genusr(uWS::WebSocket<uWS::SERVER> * s){
 		                 (uint16_t)hash[2] << 8 |
 		                           hash[3];
 
+		std::string tag = "";
 		server::Database::pinfo_t dbusr = db.get_usrinfo(filen);
+
 		if(dbusr.found){
 			color = dbusr.color;
 			name = dbusr.name;
+			tag = dbusr.tag;
 		}
 		
 		std::vector<std::string> admins = this->admins;
 
 		std::cout << "New client" << (std::count(admins.begin(), admins.end(), ip) ? " (admin)" : "") << ": " << ip << std::endl;
-		clients[ip] = {new server::Client(filen, _id, color, name, std::count(admins.begin(), admins.end(), ip)), {{s, ""}}};
+		clients[ip] = {new server::Client(filen, _id, color, name, std::count(admins.begin(), admins.end(), ip), tag), {{s, ""}}};
 	} else {
 		search->second.sockets.emplace(s, "");
 	}
