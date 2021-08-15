@@ -47,6 +47,7 @@ public:
 			bool found;
 			uint32_t color;
 			std::string name;
+			NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(pinfo_t, color, name)
 		};
 		Database(const std::string& dir) : dir(dir){
 			makedir(dir);
