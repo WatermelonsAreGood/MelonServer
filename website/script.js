@@ -2116,7 +2116,7 @@ Rect.prototype.contains = function(x, y) {
 				}
 			});
 			// this spaces stuff out but also can be used for informational
-			$('<div class="info"></div>').appendTo(menu).text(part._id + " | " + part.id);
+			$('<div class="info"></div>').appendTo(menu).text(part._id).attr('title', part.id);
 			// add menu items
 			if(gPianoMutes.indexOf(part._id) == -1) {
 				$('<div class="menu-item">Mute Notes</div>').appendTo(menu)
