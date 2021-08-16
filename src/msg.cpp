@@ -121,9 +121,29 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 					std::vector<std::string> args = split(message);
 					
 					std::string command = *(args.begin());
+					args.erase(args.begin());
 					if(command == "~test") {
 						sendserver(sv, "test suceeded", s, ssearch->second);
-                    }
+                    } else if(command == "~tag") {
+						
+						Client* cliente = ssearch->second->get_client(args[0]);
+						
+						if(args.size() != 2) {
+							sendserver(sv, "< Not enough arguments. " + std::to_string(args.size()) + "/2", s, ssearch->second);
+							return;
+						}
+
+						if(!cliente) {
+                            sendserver(sv, "< Couldn't find id. (pID)", s, ssearch->second);
+                        } else {
+							mppconn_t mppcon = sv->clients.find(cliente->ip)->second;
+
+							cliente->set_tag(args[1]);
+							sv->user_upd(mppcon);
+
+							sendserver(sv, "< " + cliente->name + "'s tag changed to " + args[1], s, ssearch->second);
+						}
+					}
 				}
 			}
 		}

@@ -62,18 +62,21 @@ public:
 		std::unordered_map<uWS::WebSocket<uWS::SERVER> *, std::string> sockets;
 	};
 	class Client {
-		uint32_t color;
-		std::string name;
-		std::string _id;
 	public:
-		Client(std::string filen, std::string n_id, uint32_t clr, std::string nme, bool admin, std::string tag) :
+		Client(std::string filen, std::string n_id, uint32_t clr, std::string nme, bool admin, std::string tag, std::string ip) :
 			color(clr),
 			name(nme),
 			_id(n_id),
 			filen(filen),
 			changed(false),
 			admin(admin),
-			tag(tag){};
+			tag(tag),
+			ip(ip){};
+		
+		uint32_t color;
+		std::string name;
+		std::string _id;
+		
 		nlohmann::json get_json();
 		Database::pinfo_t get_dbdata();
 		void set_name(std::string n){name=n;};
@@ -84,6 +87,7 @@ public:
 		bool changed;
 		bool admin;
 		std::string tag;
+		std::string ip;
 	};
 	class Room {
 		struct oinfo_t {
@@ -174,6 +178,7 @@ public:
 	nlohmann::json get_roomlist();
 	nlohmann::json genusr(uWS::WebSocket<uWS::SERVER> *);
 	bool is_adminpw(const std::string p){return p == adminpw;};
+	std::unordered_map<std::string, mppconn_t> clients;
 private:
 	std::string path;
 	std::string salt;
@@ -182,7 +187,6 @@ private:
 	uWS::Hub h;
 	server::Database db;
 	std::string adminpw;
-	std::unordered_map<std::string, mppconn_t> clients;
 	std::unordered_map<std::string, Room*> rooms;
 	std::set<uWS::WebSocket<uWS::SERVER> *> roomlist_watchers;
 	std::map<std::string, std::function<void(nlohmann::json&,uWS::WebSocket<uWS::SERVER> *)>> funcmap;
