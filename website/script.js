@@ -1267,7 +1267,7 @@ Rect.prototype.contains = function(x, y) {
             if (part.tag === 'ADMIN') nameDiv.title = 'This user is an official administrator of the site.';
             if (part.tag === 'OWNER') nameDiv.title = 'This user is the owner of the site.';
             if (part.tag === 'VERIFIED') nameDiv.title = 'This person is verified.';
-
+			if (part.tag === '🐝') nameDiv.title = '*bzzz*';
             updateLabels(part);
 
             var hasOtherDiv = false;
@@ -1397,6 +1397,7 @@ Rect.prototype.contains = function(x, y) {
             if (tag === 'ADMIN') return '#f55';
             if (tag === 'MOD') return '#0a0';
             if (tag === 'VERIFIED') return '#f5f';
+			if (tag === '🐝') return "#FFFF00"
             return '#777';
         }
 		function updateCursor(msg) {
