@@ -299,10 +299,9 @@ void server::msg::userset(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 						std::string tag = matches.str(1);
 						std::string name = matches.str(2);
 						if(!tag.empty() && !name.empty()) {
-							
-							std::cout << newn << " is custom tag. Tag: " << matches.str(1) << " Name: " << matches.str(2) << std::endl;
 							search->second.user->set_name(name);
 							search->second.user->set_tag("\u200B" + tag);
+							
 							updated = true;
 
 						}
