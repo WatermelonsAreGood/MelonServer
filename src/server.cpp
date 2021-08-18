@@ -396,33 +396,45 @@ void server::rooml_upd(Room* r, std::string _id){
 	}
 }
 
+// TODO: This doesn't check for errors. Like at all.
+// It doesn't care. Seriously.
+
+std::string sha256(std::string str) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    
+	SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, str.c_str(), str.size());
+    SHA256_Final(hash, &sha256);
+
+    std::stringstream ss;
+
+    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
+    {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    }
+    
+	return ss.str();
+}
+
 nlohmann::json server::genusr(uWS::WebSocket<uWS::SERVER> * s){
 	std::string ip = *(std::string *) s->getUserData();
 	auto search = clients.find(ip);
 	if(search == clients.end()){
 		std::string saltedip(ip + this->salt);
-		unsigned char hash[20];
-		std::string _id(20, '0');
-		std::string filen(40, '0');
-		std::string name("Rawr~");
-		SHA1((unsigned char*)saltedip.c_str(), saltedip.size(), hash);
-		for(uint8_t i = 0; i < 10; i++){
-			_id[2 * i] = hexmap[(hash[i] & 0xF0) >> 4];
-			_id[2 * i + 1] = hexmap[hash[i] & 0x0F];
-		}
 
-		for(uint8_t i = 0; i < 20; i++){
-			filen[2 * i] = hexmap[(hash[i] & 0xF0) >> 4];
-			filen[2 * i + 1] = hexmap[hash[i] & 0x0F];
-		}
+		std::string name("(=^ェ^=)");
+		std::string _id = sha256(saltedip);
 
-		uint32_t color = (uint32_t)hash[0] << 24 |
-		                 (uint32_t)hash[1] << 16 |
-		                 (uint16_t)hash[2] << 8 |
-		                           hash[3];
+		_id.resize(24);
+		
+		uint32_t color = (uint32_t)_id[0] << 24 |
+		                 (uint32_t)_id[1] << 16 |
+		                 (uint16_t)_id[2] << 8 |
+		                           _id[3];
 
 		std::string tag = "";
-		server::Database::pinfo_t dbusr = db.get_usrinfo(filen);
+		server::Database::pinfo_t dbusr = db.get_usrinfo(_id);
 
 		if(dbusr.found){
 			color = dbusr.color;
@@ -433,7 +445,8 @@ nlohmann::json server::genusr(uWS::WebSocket<uWS::SERVER> * s){
 		std::vector<std::string> admins = this->admins;
 
 		std::cout << "New client" << (std::count(admins.begin(), admins.end(), ip) ? " (admin)" : "") << ": " << ip << std::endl;
-		clients[ip] = {new server::Client(filen, _id, color, name, std::count(admins.begin(), admins.end(), ip), tag, ip), {{s, ""}}};
+
+		clients[ip] = {new server::Client(_id, color, name, std::count(admins.begin(), admins.end(), ip), tag, ip), {{s, ""}}};
 	} else {
 		search->second.sockets.emplace(s, "");
 	}
@@ -478,7 +491,7 @@ void server::reg_evts(uWS::Hub &s){
 			if(!search->second.sockets.size()){
 				if(search->second.user->changed){
 					std::cout << "Saving client." << std::endl;
-					db.set_usrinfo(search->second.user->filen,
+					db.set_usrinfo(search->second.user->_id,
 						       search->second.user->get_dbdata());
 				}
 				std::cout << "Deleted client: " << ip << std::endl;

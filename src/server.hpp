@@ -63,11 +63,10 @@ public:
 	};
 	class Client {
 	public:
-		Client(std::string filen, std::string n_id, uint32_t clr, std::string nme, bool admin, std::string tag, std::string ip) :
+		Client(std::string n_id, uint32_t clr, std::string nme, bool admin, std::string tag, std::string ip) :
 			color(clr),
 			name(nme),
 			_id(n_id),
-			filen(filen),
 			changed(false),
 			admin(admin),
 			tag(tag),
@@ -83,7 +82,6 @@ public:
 		void set_tag(std::string n){tag=n;};
 		void set_color(uint32_t c){color=c;};
 		ClientLimit quota;
-		std::string filen;
 		bool changed;
 		bool admin;
 		std::string tag;
