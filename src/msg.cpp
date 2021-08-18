@@ -281,7 +281,7 @@ void server::msg::userset(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 		std::string ip = *(std::string *) s->getUserData();
 		auto search = sv->clients.find(ip);
 
-		std::regex customtagregex{ "\\[(\\w*)\\] (.*)" };
+		std::regex customtagregex{ "\\[([a-zA-Z0-9 ]*)\\] (.*)" };
 
 		if(search != sv->clients.end() && search->second.user->quota.name.can_spend()){
 			bool updated = false;
