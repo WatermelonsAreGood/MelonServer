@@ -9,7 +9,7 @@ LD_REL    = -s
 OPT_DBG   = -Og -g
 LD_DBG    = $(OPT_DBG)
 
-CPPFLAGS += -std=c++11 -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter
+CPPFLAGS += -std=c++17 -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter
 CPPFLAGS += -MMD -MP
 
 UWS       = ./lib/uWebSockets

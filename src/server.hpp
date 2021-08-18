@@ -98,7 +98,6 @@ public:
 		bool lobby, visible, chat, crownsolo;
 		uint32_t color;
 		oinfo_t crown;
-		std::unordered_map<Client*, clinfo_t> ids;
 		std::deque<nlohmann::json> chatlog;
 	public:
 		Room(bool lby) :
@@ -108,11 +107,13 @@ public:
 			crownsolo(false),
 			color(getDefaultRoomColor()),
 			crown({NULL, NULL, {50, 50}, {50, 50}, 0}){};
+		std::unordered_map<Client*, clinfo_t> ids;
 		nlohmann::json get_json(std::string, bool);
 		nlohmann::json get_chatlog_json();
 		void push_chat(nlohmann::json&);
 		clinfo_t* get_info(Client*);
 		Client* get_client(std::string);
+		Client* get_client_id(std::string);
 		oinfo_t get_crowninfo(){return crown;};
 		bool is_lobby(){return lobby;};
 		bool chat_on(){return chat;};

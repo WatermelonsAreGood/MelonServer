@@ -263,6 +263,14 @@ server::Client* server::Room::get_client(std::string id){
 	return nullptr;
 }
 
+server::Client* server::Room::get_client_id(std::string _id){
+	for (auto c : ids)
+		if (c.first->_id == _id)
+			return c.first;
+	
+	return nullptr;
+}
+
 bool server::Room::kick_usr(uWS::WebSocket<uWS::SERVER> * s, mppconn_t& c, std::string rname){
 	std::string ip = *(std::string *) s->getUserData();
 	bool ownupd = false;

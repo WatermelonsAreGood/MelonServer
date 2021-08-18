@@ -63,16 +63,11 @@ void server::msg::n(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 
 static std::vector<std::string> split(std::string str)
 {
-    // Used to split string around spaces.
+
     std::istringstream ss(str);
-  
-    std::string word; // for storing each word
-	
+    std::string word;
 	std::vector<std::string> chars;
 
-    // Traverse through all words
-    // while loop till we get 
-    // strings to store in string word
     while (ss >> word) 
     {
 		chars.push_back(word);
@@ -86,7 +81,7 @@ void sendserver(server* sv, std::string text, uWS::WebSocket<uWS::SERVER> * s, s
 	res[0] = {
 		{"m", "a"},
 		{"a", text},
-		{"p", {{"_id", "server"}, {"color", "#25ab2c"}, {"id", "server123"}, {"name", "Server"}}},
+		{"p", {{"_id", "server"}, {"color", "#FFC0CB"}, {"id", "server"}, {"name", "Server"}}},
 		{"t", js_date_now()}
 	};
 	
@@ -123,27 +118,27 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 					
 					std::string command = *(args.begin());
 					args.erase(args.begin());
+
 					if(command == "~test") {
-						sendserver(sv, "test suceeded", s, ssearch->second);
+						sendserver(sv, "wooohoo!", s, ssearch->second);
                     } else if(command == "~tag") {
-						
-						Client* cliente = ssearch->second->get_client(args[0]);
-						
 						if(args.size() != 2) {
-							sendserver(sv, "< Not enough arguments. " + std::to_string(args.size()) + "/2", s, ssearch->second);
+							sendserver(sv, "Not enough arguments. " + std::to_string(args.size()) + "/2", s, ssearch->second);
 							return;
 						}
+						
+						Client* cliente = ssearch->second->get_client_id(args[0]);
 
-						if(!cliente) {
-                            sendserver(sv, "< Couldn't find id. (pID)", s, ssearch->second);
+						if(cliente == nullptr) {
+                            sendserver(sv, "Couldn't find _id.", s, ssearch->second);
                         } else {
 							mppconn_t mppcon = sv->clients.find(cliente->ip)->second;
 
 							cliente->set_tag(args[1]);
 							sv->user_upd(mppcon);
 
-							sendserver(sv, "< " + cliente->name + "'s tag changed to " + args[1], s, ssearch->second);
-						}
+							sendserver(sv, "" + cliente->name + "'s tag changed to " + args[1], s, ssearch->second);
+						}					
 					}
 				}
 			}
@@ -301,7 +296,7 @@ void server::msg::userset(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 						if(!tag.empty() && !name.empty()) {
 							search->second.user->set_name(name);
 							search->second.user->set_tag("\u200B" + tag);
-							
+
 							updated = true;
 
 						}
