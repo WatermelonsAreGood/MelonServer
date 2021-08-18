@@ -1,6 +1,7 @@
 #include "server.hpp"
 #include <math.h>
 #include <iostream>
+#include <regex>
 
 using nlohmann::json;
 
@@ -279,6 +280,9 @@ void server::msg::userset(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 	if(j["set"].is_object()){
 		std::string ip = *(std::string *) s->getUserData();
 		auto search = sv->clients.find(ip);
+
+		std::regex customtagregex{ "\\[(.*)\\] (.*)" };
+
 		if(search != sv->clients.end() && search->second.user->quota.name.can_spend()){
 			bool updated = false;
 
@@ -287,6 +291,22 @@ void server::msg::userset(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 				if(getUTF8strlen(newn) <= 40){
 					search->second.user->set_name(newn);
 					updated = true;
+					
+					std::smatch matches;
+					bool isCustomTag = regex_match(newn, matches, customtagregex);
+
+					if(isCustomTag) {
+						std::string tag = matches.str(1);
+						std::string name = matches.str(2);
+						if(!tag.empty() && !name.empty()) {
+							
+							std::cout << newn << " is custom tag. Tag: " << matches.str(1) << " Name: " << matches.str(2) << std::endl;
+							search->second.user->set_name(name);
+							search->second.user->set_tag("\u200B" + tag);
+							updated = true;
+
+						}
+					}
 				}
 			}
 
