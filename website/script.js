@@ -1338,9 +1338,7 @@ Rect.prototype.contains = function(x, y) {
 					tagDiv.className = "nametag";
 					tagDiv.textContent = part.tag;
 					tagDiv.style.backgroundColor = tagColor(part.tag);
-					div.appendChild(tagDiv);
-					console.log(div)
-					console.log(tagDiv)
+					div.before(tagDiv);
 				}
 
 				part.cursorDiv.appendChild(div);
