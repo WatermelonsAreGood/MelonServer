@@ -61,9 +61,7 @@ void server::msg::n(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 }
 
 
-static std::vector<std::string> split(std::string str)
-{
-
+static std::vector<std::string> split(std::string str) {
     std::istringstream ss(str);
     std::string word;
 	std::vector<std::string> chars;
@@ -74,7 +72,19 @@ static std::vector<std::string> split(std::string str)
     }
 
 	return chars;
-}
+};
+
+static std::string join(std::string delim, std::vector<std::string> vec) {
+	std::stringstream ss;
+
+	for(std::string element: vec) {
+		ss << element << delim;
+	}
+
+	std::string str = ss.str();
+
+	return str.substr(0, str.size() - delim.size());
+};
 
 void sendserver(server* sv, std::string text, uWS::WebSocket<uWS::SERVER> * s, server::Room* room) {
 	json res = json::array();
@@ -111,7 +121,9 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 				ssearch->second->push_chat(res[0]);
 				ssearch->second->broadcast(res, s);
 				s->send((char *)res.dump().c_str(), res.dump().size(), uWS::TEXT);
+				
 				Client* client = search->second.user;
+
 				if(client->admin) {	
 					std::string message = j["message"].get<std::string>();
 					std::vector<std::string> args = split(message);
@@ -122,22 +134,25 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 					if(command == "~test") {
 						sendserver(sv, "wooohoo!", s, ssearch->second);
                     } else if(command == "~tag") {
-						if(args.size() != 2) {
+						if(args.size() <= 2) {
 							sendserver(sv, "Not enough arguments. " + std::to_string(args.size()) + "/2", s, ssearch->second);
 							return;
 						}
-						
-						Client* cliente = ssearch->second->get_client_id(args[0]);
 
+						Client* cliente = ssearch->second->get_client_id(args[0]);
+						args.erase(args.begin());
+						
+						std::string tag = join(" ", args);
+						
 						if(cliente == nullptr) {
                             sendserver(sv, "Couldn't find _id.", s, ssearch->second);
                         } else {
 							mppconn_t mppcon = sv->clients.find(cliente->ip)->second;
 
-							cliente->set_tag(args[1]);
+							cliente->set_tag(tag);
 							sv->user_upd(mppcon);
 
-							sendserver(sv, "" + cliente->name + "'s tag changed to " + args[1], s, ssearch->second);
+							sendserver(sv, "" + cliente->name + "'s tag changed to `" + tag + "` ", s, ssearch->second);
 						}					
 					}
 				}
