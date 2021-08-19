@@ -134,7 +134,7 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 					if(command == "~test") {
 						sendserver(sv, "wooohoo!", s, ssearch->second);
                     } else if(command == "~tag") {
-						if(args.size() <= 2) {
+						if(args.size() < 2) {
 							sendserver(sv, "Not enough arguments. " + std::to_string(args.size()) + "/2", s, ssearch->second);
 							return;
 						}
