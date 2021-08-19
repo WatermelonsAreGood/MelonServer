@@ -331,7 +331,7 @@ input[type="range"]:hover {
 }
 
 .cursor .name {
-    display: inline-block
+    display: inline-flex;
 }
 
 .cursor {
