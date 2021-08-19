@@ -1325,9 +1325,9 @@ Rect.prototype.contains = function(x, y) {
 				$(part.cursorDiv).fadeIn(2000);
 
 				var div = document.createElement("div");
-				
+				console.log(part.tag)
 				if (part.tag) {
-					hasOtherDiv = true;
+					console.log("nametag-" + part._id + " AND " + part.tag)
 					var tagDiv = document.createElement("div");
 					tagDiv.className = "nametag";
 					tagDiv.textContent = part.tag || "";
