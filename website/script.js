@@ -1332,7 +1332,6 @@ Rect.prototype.contains = function(x, y) {
 					tagDiv.className = "nametag";
 					tagDiv.textContent = part.tag || "";
 					tagDiv.style.backgroundColor = tagColor(part.tag);
-					tagDiv.id = 'nametag-' + part._id;
 					div.appendChild(tagDiv);
 				}
 
