@@ -1325,12 +1325,24 @@ Rect.prototype.contains = function(x, y) {
 				$(part.cursorDiv).fadeIn(2000);
 
 				var div = document.createElement("div");
+				
+				if (part.tag) {
+					hasOtherDiv = true;
+					var tagDiv = document.createElement("div");
+					tagDiv.className = "nametag";
+					tagDiv.textContent = part.tag || "";
+					tagDiv.style.backgroundColor = tagColor(part.tag);
+					tagDiv.id = 'nametag-' + part._id;
+					div.appendChild(tagDiv);
+				}
+
 				div.className = "name";
 				div.style.backgroundColor = part.color || "#777"
 				div.textContent = part.name || "";
                 if (part.veteran) div.style.color = '#ffdf00';
-				part.cursorDiv.appendChild(div);
 
+
+				part.cursorDiv.appendChild(div);
 			} else {
 				part.cursorDiv = undefined;
 			}
