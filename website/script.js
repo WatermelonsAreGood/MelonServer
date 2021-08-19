@@ -1340,7 +1340,7 @@ Rect.prototype.contains = function(x, y) {
 					tagDiv.style.backgroundColor = tagColor(part.tag);
 					div.before(tagDiv);
 					console.log(div)
-					console.log(tag)
+					console.log(tagDiv)
 				}
 
 				part.cursorDiv.appendChild(div);
