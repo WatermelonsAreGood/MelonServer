@@ -310,8 +310,8 @@ input[type="range"]:hover {
 .cursor .name {
     display: inline;
     position: relative;
-    left: 16px;
-    top: 8px;
+    left: -32px;
+    top: -30px;
     pointer-events: none;
     color: #fff;
     background: #000;
