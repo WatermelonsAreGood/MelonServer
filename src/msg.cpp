@@ -86,7 +86,7 @@ static std::string join(std::string delim, std::vector<std::string> vec) {
 	return str.substr(0, str.size() - delim.size());
 };
 
-void sendserver(server* sv, std::string text, uWS::WebSocket<uWS::SERVER> * s, server::Room* room) {
+void sendserver(std::string text, server::Room* room) {
 	json res = json::array();
 	res[0] = {
 		{"m", "a"},
@@ -96,9 +96,7 @@ void sendserver(server* sv, std::string text, uWS::WebSocket<uWS::SERVER> * s, s
 	};
 	
 	room->push_chat(res[0]);
-	room->broadcast(res, s);
-
-	s->send((char *)res.dump().c_str(), res.dump().size(), uWS::TEXT);
+	room->broadcast(res);
 }
 
 void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
@@ -132,10 +130,10 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 					args.erase(args.begin());
 
 					if(command == "~test") {
-						sendserver(sv, "wooohoo!", s, ssearch->second);
+						sendserver("wooohoo!", ssearch->second);
                     } else if(command == "~tag") {
 						if(args.size() < 2) {
-							sendserver(sv, "Not enough arguments. " + std::to_string(args.size()) + "/2", s, ssearch->second);
+							sendserver("Not enough arguments. " + std::to_string(args.size()) + "/2", ssearch->second);
 							return;
 						}
 
@@ -145,15 +143,33 @@ void server::msg::a(server* sv, json& j, uWS::WebSocket<uWS::SERVER> * s){
 						std::string tag = join(" ", args);
 						
 						if(cliente == nullptr) {
-                            sendserver(sv, "Couldn't find _id.", s, ssearch->second);
+                            sendserver("Couldn't find _id.", ssearch->second);
                         } else {
 							mppconn_t mppcon = sv->clients.find(cliente->ip)->second;
 
 							cliente->set_tag(tag);
 							sv->user_upd(mppcon);
 
-							sendserver(sv, "" + cliente->name + "'s tag changed to `" + tag + "` ", s, ssearch->second);
+							sendserver(cliente->name + "'s tag changed to `" + tag + "` ", ssearch->second);
 						}					
+					} else if(command == "~annouce") {
+						std::string text = join(" ", args);
+								
+						nlohmann::json data = nlohmann::json::array();
+						data[0] = {
+							{"m", "notification"},
+							{"duration", 15000},
+							{"title", "Annoucment"},
+							{"target", "#piano"},
+							{"text", text}
+						};
+
+						for (auto& it: sv->rooms) {
+							it.second->broadcast(data);
+						}
+						
+						sendserver(text + " broadcasted to " + std::to_string(sv->rooms.size()) + " rooms.", ssearch->second);
+
 					}
 				}
 			}

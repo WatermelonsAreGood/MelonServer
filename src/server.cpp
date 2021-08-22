@@ -173,6 +173,17 @@ void server::Room::broadcast(nlohmann::json& j, uWS::WebSocket<uWS::SERVER> * ex
 	uWS::WebSocket<uWS::SERVER>::finalizeMessage(prep);
 }
 
+void server::Room::broadcast(nlohmann::json& j){
+	uWS::WebSocket<uWS::SERVER>::PreparedMessage* prep = uWS::WebSocket<uWS::SERVER>::prepareMessage(
+		(char *)j.dump().c_str(), j.dump().size(), uWS::TEXT, false);
+	for(auto& c : ids){
+		for(auto sock : c.second.sockets){
+			sock->sendPrepared(prep);
+		}
+	}
+	uWS::WebSocket<uWS::SERVER>::finalizeMessage(prep);
+}
+
 void server::Room::broadcast(const char* j, uWS::WebSocket<uWS::SERVER> * exclude, size_t len){
 	uWS::WebSocket<uWS::SERVER>::PreparedMessage* prep = uWS::WebSocket<uWS::SERVER>::prepareMessage(
 		(char*)j, len, uWS::BINARY, false);

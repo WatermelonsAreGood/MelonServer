@@ -122,6 +122,7 @@ public:
 		bool is_owner(Client* c){return c == crown.owner;};
 		jroom_clinfo_t join_usr(uWS::WebSocket<uWS::SERVER> *, mppconn_t&, std::string);
 		void broadcast(nlohmann::json&, uWS::WebSocket<uWS::SERVER> *);
+		void broadcast(nlohmann::json&);
 		void broadcast(const char*, uWS::WebSocket<uWS::SERVER> *, size_t);
 		bool kick_usr(uWS::WebSocket<uWS::SERVER> *, mppconn_t&, std::string);
 		void set_param(nlohmann::json&, std::string);
@@ -178,6 +179,7 @@ public:
 	nlohmann::json genusr(uWS::WebSocket<uWS::SERVER> *);
 	bool is_adminpw(const std::string p){return p == adminpw;};
 	std::unordered_map<std::string, mppconn_t> clients;
+	std::unordered_map<std::string, Room*> rooms;
 private:
 	std::string path;
 	std::string salt;
@@ -186,7 +188,6 @@ private:
 	uWS::Hub h;
 	server::Database db;
 	std::string adminpw;
-	std::unordered_map<std::string, Room*> rooms;
 	std::set<uWS::WebSocket<uWS::SERVER> *> roomlist_watchers;
 	std::map<std::string, std::function<void(nlohmann::json&,uWS::WebSocket<uWS::SERVER> *)>> funcmap;
 };
